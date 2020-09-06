@@ -1,15 +1,20 @@
 package com.itheima.test;
 
+import com.itheima.activiti.pojo.Holiday;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 测试表
@@ -161,6 +166,9 @@ public class ActivitiTest {
 
     }
 
+    /**
+     * 绑定业务主键
+     */
     @Test
     public void bindingBusinessKey() {
         // 获取RuntimeService
@@ -174,7 +182,7 @@ public class ActivitiTest {
     }
 
     /**
-     * 流程实例的全部挂起和激活
+     * 流程定义的全部挂起和激活
      */
     @Test
     public void suspendOrActivateProcessDefinition() {
@@ -228,6 +236,62 @@ public class ActivitiTest {
             System.out.println("流程实例:"+processInstanceId+"挂起");
         }
 
+    }
+
+    /**
+     * 使用UEL-Value动态分配任务人员
+     */
+    @Test
+    public void uelValue(){
+
+        // 获取RuntimeService
+        RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
+
+        // 设置UEL-Value表达式中的值
+        Map<String,Object> variables = new LinkedHashMap<>();
+        variables.put("assignee0","zs");
+        variables.put("assignee1","ls");
+        variables.put("assignee2","ww");
+
+        // 启动流程实例并传入设置好的参数
+        ProcessInstance holiday = runtimeService.startProcessInstanceByKey("holiday", variables);
+
+        System.out.println("流程实例名称:" + holiday.getName());
+    }
+
+    /**
+     * 启动流程实例并设置流程变量 Global
+     */
+    @Test
+    public void startProcessInstanceAndSetVar(){
+        RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
+        Holiday holiday = new Holiday();
+        holiday.setId(1);
+        holiday.setHolidayName("发起流程申请");
+        holiday.setNum(5f);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("holiday",holiday);
+        ProcessInstance holiday3 = runtimeService.startProcessInstanceByKey("holiday3", map);
+
+        System.out.println(holiday3.getProcessInstanceId());
+    }
+
+    /**
+     * 查询并提交任务
+     */
+    @Test
+    public void completTask(){
+        TaskService taskService = defaultProcessEngine.getTaskService();
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey("holiday3")
+                .taskAssignee("zhaoliu").singleResult();
+        if(task!=null){
+            taskService.complete(task.getId());
+            System.out.println("任务执行完毕");
+        }else{
+            System.out.println("该用户没有任务");
+        }
     }
 
     private void writeByte(InputStream resourceAsStream, OutputStream fileOutputStream) throws IOException {

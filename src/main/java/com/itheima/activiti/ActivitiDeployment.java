@@ -28,9 +28,9 @@ public class ActivitiDeployment {
 
         // 3:进行部署
         Deployment deploy = repositoryService.createDeployment()
-                .addClasspathResource("pic/holiday.bpmn")
-                .addClasspathResource("pic/holiday.png")
-                .name("请假申请流程")
+                .addClasspathResource("pic/holidayGroup.bpmn")
+                .addClasspathResource("pic/holidayGroup.png")
+                .name("请假流程")
                 .deploy();
 
         // 4:输出一些信息
