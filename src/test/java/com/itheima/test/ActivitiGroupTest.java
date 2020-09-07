@@ -79,12 +79,34 @@ public class ActivitiGroupTest {
     }
 
     /**
+     * 用户归还组任务
+     */
+    @Test
+    public void unClaimTask(){
+        queryTaskByCandidateUser(null, candidateUser, true).forEach(task -> {
+            taskService.setAssignee(task.getId(),null);
+            System.out.println(candidateUser + "用户丢弃了[" + task.getName() + "]任务");
+        });
+    }
+
+    /**
+     * 用户任务交接,委托
+     */
+    @Test
+    public void toAssignee(){
+        queryTaskByCandidateUser(null,candidateUser,true).forEach(task -> {
+            taskService.setAssignee(task.getId(),"lisi");
+            System.out.println(candidateUser+"用户将["+task.getName()+"]任务交接给了lisi用户");
+        });
+    }
+
+    /**
      * 查询并处理自己的任务
      */
     @Test
     public void queryCompletTask() {
 
-        queryTaskByCandidateUser(null, candidateUser, true).forEach(task -> {
+        queryTaskByCandidateUser(null, "lisi", true).forEach(task -> {
             taskService.complete(task.getId());
             System.out.println(candidateUser+"处理了["+task.getName()+"]任务");
         });
