@@ -1,20 +1,18 @@
-package com.itheima.test;
+package com.itheima.test.testGateWay;
 
-import com.itheima.activiti.pojo.Holiday;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 网关测试
+ * 测试包含网关
  */
-public class ActivitiGatewayTest {
+public class Test {
 
     ProcessEngine defaultProcessEngine;
 
@@ -23,36 +21,30 @@ public class ActivitiGatewayTest {
         defaultProcessEngine = ProcessEngines.getDefaultProcessEngine();
     }
 
-    /**
-     * 部署流程定义
-     */
-    @Test
+    @org.junit.Test
     public void deployment(){
+
         RepositoryService repositoryService = defaultProcessEngine.getRepositoryService();
 
         Deployment deploy = repositoryService.createDeployment()
                 .addClasspathResource("pic/gateway/holidayGateway3.bpmn")
-//                .addClasspathResource("pic/gateway/holidayGateway1.png")
-                .name("请假流程")
+                .name("体检流程")
                 .deploy();
 
         System.out.println(deploy);
+
     }
 
-    /**
-     * 启动流程实例
-     */
-    @Test
+    @org.junit.Test
     public void startProcessInstance(){
 
         RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
 
+        Integer userType = 1;
+
         Map<String,Object> map = new HashMap<>();
 
-        Holiday holiday = new Holiday();
-        holiday.setNum(2F);
-
-        map.put("holiday",holiday);
+        map.put("userType",userType);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess_1", map);
 
@@ -63,10 +55,11 @@ public class ActivitiGatewayTest {
     /**
      * 提交任务
      */
-    @Test
+    @org.junit.Test
     public void completTask(){
-        String assignee = "liuba";
+        String assignee = "sunqi";
         Task task = querySingResultByAssignee(assignee);
+        System.out.println(task);
         TaskService taskService = defaultProcessEngine.getTaskService();
         taskService.complete(task.getId());
     }
@@ -80,4 +73,5 @@ public class ActivitiGatewayTest {
         TaskService taskService = defaultProcessEngine.getTaskService();
         return taskService.createTaskQuery().processDefinitionKey("myProcess_1").taskAssignee(assignee).singleResult();
     }
+
 }
